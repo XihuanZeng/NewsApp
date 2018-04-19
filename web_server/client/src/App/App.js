@@ -1,9 +1,13 @@
+// materialize depends on jquery
+
 import 'materialize-css/dist/css/materialize.min.css';
 import './App.css';
 
+// since we use create-react-app to init this project, react is automatically installed
+// otherwise you need to do npm install
 import React from 'react';
 
-// you have to put it in the same dir
+// some random logo that I found online
 import logo from './logo.png';
 import NewsPanel from '../NewsPanel/NewsPanel';
 
