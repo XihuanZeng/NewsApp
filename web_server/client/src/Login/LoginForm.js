@@ -17,3 +17,5 @@ const LoginForm = ({
     <div className="container">
     </div>
 }
+
+export default LoginForm;

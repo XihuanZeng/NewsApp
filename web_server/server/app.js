@@ -8,6 +8,8 @@ var news = require('./routes/news');
 
 
 // view engine setup
+// "views" is a folder/directory which contain the html files, 
+// and express looks for the "views" folder as default 
 app.set('views', path.join(__dirname, '../client/build/'));
 app.set('view engine', 'jade');
 app.use('/static',

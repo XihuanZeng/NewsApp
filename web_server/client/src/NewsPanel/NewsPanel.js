@@ -11,12 +11,30 @@ class NewsPanel extends React.Component {
         this.state = { news:null };    
     }
 
+    // @overirde
+    // execution lifecycle: after constructor, then render, then this function
+    componentDidMount() {
+        this.loadMoreNews();
+        // debouncing
+        this.loadMoreNews = _.debounce(this.loadMoreNews, 1000);
+        window.addEventListener('scroll', () => this.handleScroll());
+    }
+
+    handleScroll() {
+        let scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+        if ((window.innerHeight + scrollY) >= (document.body.offsetHeight - 50)) {
+          console.log('Handle Scroll.');
+          this.loadMoreNews();
+        }
+      }
+
     renderNews() {
         const news_list = this.state.news.map((news) => {
             // for each news
-            // key is recommeded
+            // key is recommended     
+            // { news } is not the one in this.state, but input of this function
             return (
-                <a className='list-group-item' key={news.digest} href='#'>
+                <a className='list-group-item' href='#'>
                     <NewsCard news={news} />
                 </a>
             );
@@ -30,14 +48,6 @@ class NewsPanel extends React.Component {
         );
     }
 
-    // @overirde
-    // execution lifecycle: after constructor, then render, then this function
-    componentDidMount() {
-        this.loadMoreNews();
-        // debouncing
-        this.loadMoreNews = _.debounce(this.loadMoreNews, 1000);
-        window.addEventListener('scroll', () => this.handleScroll());
-    }
 
     // get news from server
     // it is get "more" news, this has state
@@ -56,20 +66,20 @@ class NewsPanel extends React.Component {
       }
     
     render() {
-        // if have news
-        // render to NewsCard Component
-        if (this.state.news){
-            return (
-                <div>
-                    {this.renderNews()}
-                </div>
-            )
-        } else {
+        if (this.state.news) {
+          return (
             <div>
-                Loading...
+              {this.renderNews()}
             </div>
-        };
-    };
+          );
+        } else {
+          return (
+            <div>
+              Loading...
+            </div>
+          );
+        }
+      }
 }
 
 export default NewsPanel;

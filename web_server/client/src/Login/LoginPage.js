@@ -2,6 +2,7 @@
 
 import './LoginForm.css';
 import React from 'react';
+import LoginForm from './LoginForm';
 
 class LoginPage extends React.Component {
     constructor() {
@@ -20,9 +21,8 @@ class LoginPage extends React.Component {
     render() {
         return (
             <LoginForm
-            onSubmit = {(e)=> this.processForm(e)},
-            onChange = {(e)=> this.changeUser(e)},
-            
+            onSubmit = {(e)=> this.processForm(e)}
+            onChange = {(e)=> this.changeUser(e)}
             />
         );
     }

@@ -10,7 +10,7 @@ class NewsCard extends React.Component {
 
     // copy from 
     // conditional rendering
-    // what is this.props? what variable does this.props has
+    // what is this.props? this.props is passed by NewsPanel
     render() {
         return (
           <div className="news-container" onClick={(e) => this.redirectToUrl(this.props.news.url, e)}>
