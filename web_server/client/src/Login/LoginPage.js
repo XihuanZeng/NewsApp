@@ -1,6 +1,5 @@
 // Logic
 
-import './LoginForm.css';
 import React from 'react';
 import LoginForm from './LoginForm';
 
@@ -23,6 +22,7 @@ class LoginPage extends React.Component {
             <LoginForm
             onSubmit = {(e)=> this.processForm(e)}
             onChange = {(e)=> this.changeUser(e)}
+            errors={this.state.errors}
             />
         );
     }
@@ -34,8 +34,9 @@ class LoginPage extends React.Component {
         const email = this.state.user.email;
         const password = this.state.user.password;
 
-        // console.log
-        // post login 
+        console.log('email:', email);
+        console.log('password', password);
+        // TODO: post login 
     }
 
     // this event is system generate for us
