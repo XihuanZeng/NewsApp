@@ -6,7 +6,6 @@ var app = express();
 var index = require('./routes/index');
 var news = require('./routes/news');
 
-
 // view engine setup
 // "views" is a folder/directory which contain the html files, 
 // and express looks for the "views" folder as default 

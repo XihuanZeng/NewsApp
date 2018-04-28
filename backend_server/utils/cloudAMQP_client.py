@@ -1,11 +1,12 @@
 import pika
+import json
 
 ## here we need multiple connection, cannot use singleton
 class CloudAMQPClient:
     def __init__(self, cloud_amqp_url, queue_name):
         self.cloud_amqp_url = cloud_amqp_url
         self.queue_name = queue_name
-        self.params = pika.URLParameter(cloud_amqp_url)
+        self.params = pika.URLParameters(cloud_amqp_url)
         self.params.socket_timeout = 3
 
         self.connection = pika.BlockingConnection(self.params)
@@ -37,6 +38,6 @@ class CloudAMQPClient:
     def sleep(self, seconds):
         # pika function, keep heartbeat while sleep.
         # note if you use Thread.sleep() your heartbeat sleep as well
-        self.connection.sleep()
+        self.connection.sleep(seconds)
         
 

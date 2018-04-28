@@ -1,8 +1,39 @@
 var express = require('express');
 var router = express.Router();
+const fs = require('fs');
+var winston = require('winston');
+
+const logDir = 'log';
+const tsFormat = () => (new Date()).toLocaleTimeString();
+
+
+
+// we should refactor this part, put this into a logger.js and import from different modules
+// we should also partition our err and stdout into different log files, use exceptionHandler
+const logger = new (winston.Logger)({
+  transports: [
+    // colorize the output to the console
+    new (winston.transports.Console)(
+      { colorize: true,
+        timestamp: tsFormat,
+        level: 'info' }),
+    new (winston.transports.File)(
+      { filename: `${logDir}/results.log`,
+        timestamp: tsFormat,
+        level: 'info' }),
+  ]
+});
+logger.level = 'debug';
+
+// Create the log directory if it does not exist
+if (!fs.existsSync(logDir)) {
+  fs.mkdirSync(logDir);
+}
+
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
+  logger.info('getting more news')
   news = [
     {
       "source": "The Wall Street Journal",
@@ -57,6 +88,7 @@ router.get('/', function(req, res, next) {
   ]
   // it was res.render() in the template
   res.json(news);
+
 });
 
 module.exports = router;

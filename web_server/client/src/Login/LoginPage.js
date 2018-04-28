@@ -1,11 +1,16 @@
 // Logic
-
+import Auth from '../Auth/Auth';
 import React from 'react';
 import LoginForm from './LoginForm';
+import PropTypes from 'prop-types'
 
 class LoginPage extends React.Component {
-    constructor() {
-        super();
+    // I think in all documentations constructor() only has 1 arg, which is props
+    // to make it possible to use context.router, we have to at the end of the page
+    // use ProtoTypes.
+
+    constructor(props, context) {
+        super(props, context);
 
         // init component
         this.state = {
@@ -36,7 +41,42 @@ class LoginPage extends React.Component {
 
         console.log('email:', email);
         console.log('password', password);
-        // TODO: post login 
+        // post login 
+        const url = 'http://' + window.location.hostname + ':3000' + '/auth/login';
+        const request = new Request(
+          url,
+          {
+            method:'POST', headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: this.state.user.email,
+            password: this.state.user.password
+          })
+        });
+
+        fetch(request).then(response => {
+            if (response.status === 200) {
+              this.setState({
+                errors: {}
+              });
+      
+              response.json().then(json => {
+                console.log(json);
+                Auth.authenticateUser(json.token, email);
+                this.context.router.replace('/');
+              });
+            } else {
+              console.log('Login failed');
+              response.json().then(json => {
+                const errors = json.errors ? json.errors : {};
+                errors.summary = json.message;
+                this.setState({errors});
+              });
+            }
+          });
+
     }
 
     // this event is system generate for us
@@ -49,4 +89,8 @@ class LoginPage extends React.Component {
     }
 }
 
+// To make react-router work
+LoginPage.contextTypes = {
+    router: PropTypes.object.isRequired
+  };
 export default LoginPage;
