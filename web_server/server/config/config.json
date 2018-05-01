@@ -1,0 +1,4 @@
+{
+    "mongoDbUri": "mongodb://user:user@ds151707.mlab.com:51707/xzproblems",
+    "jwtSecret": "xihuan"
+}

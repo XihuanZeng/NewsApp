@@ -34,7 +34,7 @@ class LoginPage extends React.Component {
 
     processForm(event) {
         // cannot let you do the post request and reload page
-        event.preventDedault();
+        event.preventDefault();
 
         const email = this.state.user.email;
         const password = this.state.user.password;
@@ -57,6 +57,7 @@ class LoginPage extends React.Component {
         });
 
         fetch(request).then(response => {
+            // this 200 means post request succeed, authentication passed on backend
             if (response.status === 200) {
               this.setState({
                 errors: {}
@@ -64,6 +65,7 @@ class LoginPage extends React.Component {
       
               response.json().then(json => {
                 console.log(json);
+                // here we just store the token on local browser
                 Auth.authenticateUser(json.token, email);
                 this.context.router.replace('/');
               });
@@ -93,4 +95,6 @@ class LoginPage extends React.Component {
 LoginPage.contextTypes = {
     router: PropTypes.object.isRequired
   };
+
+
 export default LoginPage;

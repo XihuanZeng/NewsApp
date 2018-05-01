@@ -3,6 +3,8 @@ import './NewsPanel.css';
 import NewsCard from '../NewsCard/NewsCard';
 // utility for debouncing
 import _ from 'lodash';
+import Auth from '../Auth/Auth';
+
 
 class NewsPanel extends React.Component {
     constructor() {
@@ -54,7 +56,12 @@ class NewsPanel extends React.Component {
     loadMoreNews() {
         console.log('Loading more news!');
         const news_url = 'http://' + window.location.hostname + ':3000' + '/news'
-        const request = new Request(news_url, { method:'GET' });
+        const request = new Request(news_url, { 
+          method:'GET',
+          headers: {
+            'Authorization': 'bearer ' + Auth.getToken(),
+            }
+          });
     
         fetch(request)
           .then(res => res.json())
