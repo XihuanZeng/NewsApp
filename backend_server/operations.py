@@ -1,10 +1,19 @@
 import json
 import os
 import sys
+import redis
+import pickle
 from bson.json_util import dumps
+from datetime import datetime
 from utils import mongodb_client
 from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCServer
 
+# server send batch size
+NEWS_LIST_BATCH_SIZE = 10
+NEWS_LIMIT = 0
+USER_NEWS_TIME_OUT_IN_SECONDS = 60
+
+redis_client = redis.StrictRedis(REDIS_HOST, REDIS_PORT, db=0)
 
 ## hello world API
 def add(num1, num2):
@@ -17,3 +26,41 @@ def getOneNews():
     res = mongodb_client.get_db()['news'].find_one()
     return json.loads(dumps(res))
 
+def getNewsSummariesForUser(user, page_number):
+    page_number = int(page_number)
+    begin_index = (page_number - 1) * NEWS_LIST_BATCH_SIZE
+    end_index = page_number * NEWS_LIST_BATCH_SIZE
+
+    # final list of news to be returned
+    sliced_news = []
+
+    if redis_client.get(user_id) is not None:
+        news_digests = pickle.loads(redis_client.get(user_id)) 
+        # this is just get key, need to go to MongoDB to get value
+        sliced_news_digests = news_digests[begin_index, end_index]
+        # Mongo has index on digest, so find is quick
+        db = mongodb_client.get_db()
+        sliced_news = list(db[NEWS_TABLE_NAME].find({'digest:': {'$in':sliced_news_digests}}))
+    else:
+        # if not in Redis, call mongo, mongo is user neutral
+        db = mongodb_client.get_db()
+        # in mongo db we have a list of news
+        # we know this is costly, so each user hopefully we only hit this once
+        # an optimization is to cache this, but must think of the update frequency of this sorted list
+        total_news = list(db[NEWS_TABLE_NAME]).find().sort([('publishedAt', -1)]).limit(NEWS_LIMIT))
+        total_news_digest = [x['digest'] for x in total_news]
+
+        # only save digest in Redis, reduce memory of Redis
+        redis_client.set(user_id, pickle.dumps(total_news_digest))
+        redis_client.expire(user_id, USER_NEWS_TIME_OUT_IN_SECONDS)
+
+        sliced_news = total_news[begin_index, end_index]
+
+    # post-process
+    for news in sliced_news:
+        # delete text since if user not click it, it is not necessary to show
+        del news['test']
+        if news['publishedAt'].date() == datetime.today().date():
+            news['time'] = 'today'
+    
+    return json.loads(dumps(sliced_news))
