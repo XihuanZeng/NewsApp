@@ -11,25 +11,23 @@ def add(num1, num2):
     print ('add is called with %s and %s' % (num1, num2))
     return operations.add(num1, num2)
 
-def get_one_news():
-    print ('getOneNews is called')
-    # random find one
-    return  operations.getOneNews()
+def getOneNews():
+    """ Test method to get one news """
+    print("getOneNews is called")
+    return operations.getOneNews()
 
-def get_news_summaries_for_user(user_id, page_number):
-    """
-    summaries means there is no news content back
-    """
-    print ("get news summaries for user is called with %s and %s" % (user_id, page_number))
-    return operations.getNewsSummariesForUser(user, page_number)
+def getNewsSummariesForUser(user_id, page_num):
+    """ Get news summaries for a user """
+    print("get_news_summaries_for_user is called with %s and %s" % (user_id, page_num))
+    return operations.getNewsSummariesForUser(user_id, page_num)
 
 
 
 RPC_SERVER = SimpleJSONRPCServer((SERVER_HOST, SERVER_PORT))
 ## 'add' is what exposed to external user 
 RPC_SERVER.register_function(add, 'add')
-RPC_SERVER.register_function(get_one_news, 'get_one_news')
-RPC_SERVER.register_function(get_news_summaries_for_user, 'get_news_summaries_for_user')
+RPC_SERVER.register_function(getOneNews, 'getOneNews')
+RPC_SERVER.register_function(getNewsSummariesForUser, 'getNewsSummariesForUser')
 
 print ("Starting RPC on %s:%s" % (SERVER_HOST, SERVER_PORT))
 RPC_SERVER.serve_forever()
