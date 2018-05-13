@@ -18,16 +18,19 @@ def getOneNews():
 
 def getNewsSummariesForUser(user_id, page_num):
     """ Get news summaries for a user """
-    print("get_news_summaries_for_user is called with %s and %s" % (user_id, page_num))
+    print("getNewsSummariesForUser is called with %s and %s" % (user_id, page_num))
     return operations.getNewsSummariesForUser(user_id, page_num)
 
-
+def logNewsClickForUser(user_id, news_id):
+    print("logNewsClickForUser is called with %s and %s" % (user_id, news_id))
+    return operations.logNewsClickForUser(user_id, news_id)
 
 RPC_SERVER = SimpleJSONRPCServer((SERVER_HOST, SERVER_PORT))
 ## 'add' is what exposed to external user 
 RPC_SERVER.register_function(add, 'add')
 RPC_SERVER.register_function(getOneNews, 'getOneNews')
 RPC_SERVER.register_function(getNewsSummariesForUser, 'getNewsSummariesForUser')
+RPC_SERVER.register_function(logNewsClickForUser, 'logNewsClickForUser')
 
 print ("Starting RPC on %s:%s" % (SERVER_HOST, SERVER_PORT))
 RPC_SERVER.serve_forever()

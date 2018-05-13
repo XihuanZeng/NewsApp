@@ -10,6 +10,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'common'))
 
 import mongodb_client
 from cloudAMQP_client import CloudAMQPClient
+import news_topic_modeling_service_client
 
 DEDUPE_NEWS_TASK_QUEUE_URL = 'amqp://nybetvtl:QTN3c1uP-hWf-oLyVxIGbui71hXIIxDj@eagle.rmq.cloudamqp.com/nybetvtl'
 DEDUPE_NEWS_TASK_QUEUE_NAME = 'news_deduper'
@@ -59,7 +60,13 @@ def handle_message(msg):
                 return
     task['publishedAt'] = parser.parse(task['publishedAt'])
 
-    # only non-duplicated news can from news_dedup queue can be insert into Mongo
+    # Classify news
+    title = task['title']
+    if title is not None:
+        topic = news_topic_modeling_service_client.classify(title)
+        task['class'] = topic
+        
+    # only non-duplicated news come from news_dedup queue can be insert into Mongo
     db[NEWS_TABLE_NAME].replace_one({'digest': task['digest']}, task, upsert=True)
 
 def run():

@@ -24,6 +24,12 @@ REDIS_PORT = 6379
 # redis access db by index db=0
 redis_client = redis.StrictRedis(REDIS_HOST, REDIS_PORT, db=0)
 
+LOG_CLICK_TASK_QUEUE_URL = ''
+LOG_CLICK_TASK_QUEUE_NAME = ''
+
+# TODO
+cloudamqp_client = None
+
 ## hello world API
 def add(num1, num2):
     print ('add is called with %s and %s' % (num1, num2))
@@ -82,3 +88,6 @@ def getNewsSummariesForUser(user_id, page_number):
             news['time'] = 'today'
     
     return json.loads(dumps(sliced_news))
+
+def logNewsClickForUser(user_id, news_id):
+    message = {'userId': user_id, 'news_id': news_id, 'timestamp': str(datetime.utcnow())}
