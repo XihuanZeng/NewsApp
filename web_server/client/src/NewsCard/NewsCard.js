@@ -1,13 +1,32 @@
 import './NewsCard.css';
 import React from 'react';
+import Auth from '../Auth/Auth';
 
 class NewsCard extends React.Component {
     redirectToUrl(url, e) {
         // after you do this, you can overwrite default
         e.preventDefault();
+        this.sendClickLog();
         window.open(url, '_blank');
     }
 
+    // request send to Node
+    // here we don't care response
+    // bearer is auth type, type + <SPACE> + token, this should be consistent with Node 
+    // note that we can also send body with header json
+    sendClickLog() {
+      const url = 'http://' + window.location.hostname + '3000' + '/news/userId=' 
+        + Auth.getEmail() + '&newsId=' + this.props.news.digest;
+      const request = new Request(
+        encodeURI(url), 
+        {
+          method: 'POST',
+          headers: {'Authroization': 'bearer ' + Auth.getToken()},
+        }
+      );
+      // no response needed
+      fetch(request);
+    }
     // copy from 
     // conditional rendering
     // what is this.props? this.props is passed by NewsPanel

@@ -8,6 +8,7 @@ from datetime import datetime
 from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCServer
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'common'))
+from cloudAMQP_client import CloudAMQPClient
 import mongodb_client
 
 # server send batch size
@@ -24,11 +25,9 @@ REDIS_PORT = 6379
 # redis access db by index db=0
 redis_client = redis.StrictRedis(REDIS_HOST, REDIS_PORT, db=0)
 
-LOG_CLICK_TASK_QUEUE_URL = ''
-LOG_CLICK_TASK_QUEUE_NAME = ''
-
-# TODO
-cloudamqp_client = None
+LOG_CLICKS_TASK_QUEUE_URL = 'amqp://nybetvtl:QTN3c1uP-hWf-oLyVxIGbui71hXIIxDj@eagle.rmq.cloudamqp.com/nybetvtl'
+LOG_CLICKS_TASK_QUEUE_NAME = 'news_logger'
+cloudamqp_client =  CloudAMQPClient(LOG_CLICKS_TASK_QUEUE_URL, LOG_CLICKS_TASK_QUEUE_NAME)
 
 ## hello world API
 def add(num1, num2):
@@ -78,6 +77,13 @@ def getNewsSummariesForUser(user_id, page_number):
 
         sliced_news = total_news[begin_index: end_index]
 
+    # TODO: use preference to customize returned news list.
+    preference = news_recommendation_service_client.getPreferenceForUser(user_id)
+    topPreference = None
+
+    if preference is not None and len(preference) > 0:
+        topPreference = preference[0]
+
     # post-process
     for news in sliced_news:
         # in NewsCard, we only show digest of the news, there is no need to show the content
@@ -90,4 +96,5 @@ def getNewsSummariesForUser(user_id, page_number):
     return json.loads(dumps(sliced_news))
 
 def logNewsClickForUser(user_id, news_id):
-    message = {'userId': user_id, 'news_id': news_id, 'timestamp': str(datetime.utcnow())}
+    message = {'userId': user_id, 'newsId': news_id, 'timestamp': str(datetime.utcnow())}
+    cloudamqp_client.sendMessage(message)
